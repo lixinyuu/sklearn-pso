@@ -25,6 +25,116 @@ from .utils import Bound, LogSpace
 from .optimize import PSOoptimizer
 
 class PSOSearchCV(BaseSearchCV):
+     """
+    Partical swar search of best hyperparameters, based on Genetic
+    Algorithms
+    Parameters
+    ----------
+    estimator : estimator object.
+        This is assumed to implement the scikit-learn estimator interface.
+        Either estimator needs to provide a ``score`` function,
+        or ``scoring`` must be passed.
+    param_grid : dict or list of dictionaries
+        Dictionary with parameters names (`str`) as keys and space of
+        parameter settings to try as values.
+    n_particles:: int
+        The number of parameters set which will be tested in one PSO iteration
+    iterations:: int
+        The iterations of PSO optimization
+    pso_c1:: float
+        PSO optimization parameters
+    pso_c2:: float
+        PSO optimization parameters
+    pso_w:: float
+        PSO optimization parameters
+    scoring : str, callable, list/tuple or dict, default=None
+        A single str (see :ref:`scoring_parameter`) or a callable
+        (see :ref:`scoring`) to evaluate the predictions on the test set.
+        For evaluating multiple metrics, either give a list of (unique) strings
+        or a dict with names as keys and callables as values.
+        NOTE that when using custom scorers, each scorer should return a single
+        value. Metric functions returning a list/array of values can be wrapped
+        into multiple scorers that return one value each.
+        See :ref:`multimetric_grid_search` for an example.
+        If None, the estimator's score method is used.
+    n_jobs : int, default=None
+        Number of jobs to run in parallel.
+        ``None`` means 1 unless in a :obj:`joblib.parallel_backend` context.
+        ``-1`` means using all processors. See :term:`Glossary <n_jobs>`
+        for more details.
+    pre_dispatch : int, or str, default=n_jobs
+        Controls the number of jobs that get dispatched during parallel
+        execution. Reducing this number can be useful to avoid an
+        explosion of memory consumption when more jobs get dispatched
+        than CPUs can process. This parameter can be:
+            - None, in which case all the jobs are immediately
+              created and spawned. Use this for lightweight and
+              fast-running jobs, to avoid delays due to on-demand
+              spawning of the jobs
+            - An int, giving the exact number of total jobs that are
+              spawned
+            - A str, giving an expression as a function of n_jobs,
+              as in '2*n_jobs'
+    iid : bool, default=False
+        If True, return the average score across folds, weighted by the number
+        of samples in each test set. In this case, the data is assumed to be
+        identically distributed across the folds, and the loss minimized is
+        the total loss per sample, and not the mean loss across the folds.
+        .. deprecated:: 0.22
+            Parameter ``iid`` is deprecated in 0.22 and will be removed in 0.24
+    cv : int, cross-validation generator or an iterable, default=None
+        Determines the cross-validation splitting strategy.
+        Possible inputs for cv are:
+        - None, to use the default 5-fold cross validation,
+        - integer, to specify the number of folds in a `(Stratified)KFold`,
+        - :term:`CV splitter`,
+        - An iterable yielding (train, test) splits as arrays of indices.
+        For integer/None inputs, if the estimator is a classifier and ``y`` is
+        either binary or multiclass, :class:`StratifiedKFold` is used. In all
+        other cases, :class:`KFold` is used.
+        Refer :ref:`User Guide <cross_validation>` for the various
+        cross-validation strategies that can be used here.
+        .. versionchanged:: 0.22
+            ``cv`` default value if None changed from 3-fold to 5-fold.
+    refit : bool, str, or callable, default=True
+        Refit an estimator using the best found parameters on the whole
+        dataset.
+        For multiple metric evaluation, this needs to be a `str` denoting the
+        scorer that would be used to find the best parameters for refitting
+        the estimator at the end.
+        Where there are considerations other than maximum score in
+        choosing a best estimator, ``refit`` can be set to a function which
+        returns the selected ``best_index_`` given ``cv_results_``. In that
+        case, the ``best_estimator_`` and ``best_params_`` will be set
+        according to the returned ``best_index_`` while the ``best_score_``
+        attribute will not be available.
+        The refitted estimator is made available at the ``best_estimator_``
+        attribute and permits using ``predict`` directly on this
+        ``GridSearchCV`` instance.
+        Also for multiple metric evaluation, the attributes ``best_index_``,
+        ``best_score_`` and ``best_params_`` will only be available if
+        ``refit`` is set and all of them will be determined w.r.t this specific
+        scorer.
+        See ``scoring`` parameter to know more about multiple metric
+        evaluation.
+        .. versionchanged:: 0.20
+            Support for callable added.
+    verbose : integer
+        Controls the verbosity: the higher, the more messages.
+    error_score : 'raise' or numeric, default=np.nan
+        Value to assign to the score if an error occurs in estimator fitting.
+        If set to 'raise', the error is raised. If a numeric value is given,
+        FitFailedWarning is raised. This parameter does not affect the refit
+        step, which will always raise the error.
+    return_train_score : bool, default=False
+        If ``False``, the ``cv_results_`` attribute will not include training
+        scores.
+        Computing training scores is used to get insights on how different
+        parameter settings impact the overfitting/underfitting trade-off.
+        However computing the scores on the training set can be computationally
+        expensive and is not strictly required to select the parameters that
+        yield the best generalization performance.
+    """
     def __init__(self, estimator, param_grid, scoring=None, cv=None,refit=True, verbose=0, 
                  n_particles=64, iterations =20, pso_c1 = 0.5, pso_c2 = 0.3, 
                  pso_w = 0.9, n_jobs=None,  iid = True,pre_dispatch='2*n_jobs',
@@ -41,6 +151,7 @@ class PSOSearchCV(BaseSearchCV):
         self._check_params()
     
     def _check_params(self):
+        """ Only those parameters defined as Bound or LogSpace will be searched in PSO """
         self.fixed_param = OrderedDict()
         self.eval_param = OrderedDict()
         self.eval_logbase = OrderedDict()
