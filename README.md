@@ -4,7 +4,7 @@ Use partical swarm optimization instead of gridsearch in scikit-learn. There is 
 It's implemented using pyswarms library: https://github.com/ljvmiranda921/pyswarms \
 Heavily inspired by:\
 sklearn-deap: https://github.com/rsteca/sklearn-deap \
-scikit-learn https://github.com/scikit-learn/scikit-learn\
+scikit-learn https://github.com/scikit-learn/scikit-learn \
 
 Install
 -------
