@@ -17,6 +17,16 @@ class Bound:
         self.high = np.max([a, b])
 
 class LogSpace:
+    """
+    The class used to define a log space for PSO to search
+    If we are going to find a paramers between 1e-9 to 1e9,
+    it is easily to guess that most of the initial guess will 
+    be located between 1e8 to 1e9, which prevent the PSO 
+    algorithms to search the space between 1e-9 to 1e8. In this
+    implementation, we use this class to make the parameters that
+    are searched in PSO is -9 to 9, and then use logbase to retrive 
+    the real value.
+    """
     def __init__(self, logbase, a, b):
         assert a != b
         self.logbase = logbase
