@@ -1,5 +1,5 @@
 # sklearn-pso
-Use partical swarm optimization instead of gridsearch in scikit-learn. There is a similar package sklearn-deap which use evolutionary algortihms to find the parameters. However, evolutionary algorithms do not work on continus parameters.
+Use partical swarm optimization instead of gridsearch in scikit-learn. There is a similar package sklearn-deap which use evolutionary algortihms to find the parameters. However, PSO should works better in continuous parameters search.
 
 It's implemented using pyswarms library: https://github.com/ljvmiranda921/pyswarms \
 Heavily inspired by:\
