@@ -2,6 +2,7 @@
 Use partical swarm optimization instead of gridsearch in scikit-learn. There is a similar package sklearn-deap which use evolutionary algortihms to find the parameters. However, evolutionary algorithms do not work on continus parameters.
 
 It's implemented using pyswarms library: https://github.com/ljvmiranda921/pyswarms
+Heavily inspired by sklearn-deap: https://github.com/rsteca/sklearn-deap and scikit-learn/GridSearchCV https://github.com/scikit-learn/scikit-learn/blob/master/sklearn/model_selection/_search.py
 
 Install
 -------
