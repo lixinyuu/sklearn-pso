@@ -9,7 +9,7 @@ scikit-learn https://github.com/scikit-learn/scikit-learn
 Install
 -------
 
-**To do
+Download manually
 
 Usage examples
 --------------
@@ -37,25 +37,25 @@ random.seed(1)
 
 from pso_search import PSOSearchCV
 cv = PSOSearchCV(estimator=SVC(),
-                                   param_grid=paramgrid,
-                                   scoring="accuracy",
-                                   n_particles=32, 
-                                   cv=StratifiedKFold(n_splits=4),
-                                   verbose=0,
-                                   iterations = 5, 
-                                   n_jobs=4)
+                 param_grid=paramgrid,
+                 scoring="accuracy",
+                 n_particles=32, 
+                 cv=StratifiedKFold(n_splits=4),
+                 verbose=0,
+                 iterations = 5, 
+                 n_jobs=4)
 cv.fit(X, y)
 ```
 
 Output:
 
-        Iteration: 1 | avg: -0.2584 | min:-0.9655 | std: 0.3028
-        Iteration: 2 | avg: -0.2988 | min:-0.9716 | std: 0.3433
-        Iteration: 3 | avg: -0.4924 | min:-0.9805 | std: 0.3897
-        Iteration: 4 | avg: -0.6691 | min:-0.9805 | std: 0.4020
-        Iteration: 5 | avg: -0.6961 | min:-0.9805 | std: 0.3804
-        The best cost found by pso is: -0.9805
-        The best position found by pso is: [1.18500897e+01 5.64562914e-04]
+    Iteration: 1 | avg: -0.1869 | min:-0.9610 | std: 0.2276
+    Iteration: 2 | avg: -0.2778 | min:-0.9777 | std: 0.3127
+    Iteration: 3 | avg: -0.5939 | min:-0.9805 | std: 0.4043
+    Iteration: 4 | avg: -0.7939 | min:-0.9805 | std: 0.3212
+    Iteration: 5 | avg: -0.9031 | min:-0.9805 | std: 0.2037
+    The best cost found by pso is: -0.9805
+    The best position found by pso is: {'C': 346108044.60263175, 'gamma': 0.0005722350238635339, 'kernel': 'rbf'}
         
 To do list
 ----------

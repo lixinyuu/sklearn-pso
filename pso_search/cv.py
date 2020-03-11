@@ -285,11 +285,15 @@ class PSOSearchCV(BaseSearchCV):
             if optimizer.reached_requirement == 1:
                 print("Accuracy Requirement reached, optimization stop.")
         final_best_cost, final_best_pos = optimizer.finalize()
+        final_best_pos  = self.get_real_position(final_best_pos)
+        final_best_pos = {swarm_keys[idx]:final_best_pos[idx] for idx in range(len(min_bound))}
+        final_best_pos = {**final_best_pos, **self.fixed_param}
         print('The best cost found by pso is: {:.4f}'.format(final_best_cost))
-        print('The best position found by pso is: {}'.format(self.get_real_position(final_best_pos)))
+        print('The best position found by pso is: {}'.format(final_best_pos))
         
         results = self._format_results(
                     all_candidate_params, self.scorers, n_splits, all_out)
+        
         return results
     
     def get_real_position(self, pos):

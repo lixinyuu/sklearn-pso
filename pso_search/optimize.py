@@ -106,6 +106,7 @@ class PSOoptimizer(SwarmOptimizer):
             the current iterations
         current_cost : ndarray
             the current cost which should be provided
+        """
 
         self.rep.log("Obj. func. args: {}".format(kwargs), lvl=logging.DEBUG)
         self.rep.log(
