@@ -21,11 +21,11 @@ import pyswarms.backend as P
 from pyswarms.backend.operators import compute_pbest
 from pyswarms.backend.topology import Star
 from collections import OrderedDict
-from .utils import Bound, LogSpace
+from .utils import Bound, LogSpace, BaseMapFunction
 from .optimize import PSOoptimizer
 
 class PSOSearchCV(BaseSearchCV):
-     """
+    """
     Partical swar search of best hyperparameters, based on Genetic
     Algorithms
     Parameters
@@ -135,8 +135,8 @@ class PSOSearchCV(BaseSearchCV):
         expensive and is not strictly required to select the parameters that
         yield the best generalization performance.
     """
-    def __init__(self, estimator, param_grid, scoring=None, cv=None,refit=True, verbose=0, 
-                 n_particles=64, iterations =20, pso_c1 = 0.5, pso_c2 = 0.3, 
+    def __init__(self, estimator, param_grid, scoring=None, cv=None, refit=True, 
+                 verbose=0, n_particles=64, iterations =20, pso_c1 = 0.5, pso_c2 = 0.3, 
                  pso_w = 0.9, n_jobs=None,  iid = True,pre_dispatch='2*n_jobs',
                  error_score=np.nan, return_train_score=False):
         super().__init__(estimator=estimator, scoring=scoring,cv=cv,refit=refit,verbose=verbose,
@@ -154,14 +154,11 @@ class PSOSearchCV(BaseSearchCV):
         """ Only those parameters defined as Bound or LogSpace will be searched in PSO """
         self.fixed_param = OrderedDict()
         self.eval_param = OrderedDict()
-        self.eval_logbase = OrderedDict()
+        self.eval_func = OrderedDict()
         for k, v in self.param_grid.items():
-            if isinstance(v, Bound):
+            if isinstance(v, BaseMapFunction):
                 self.eval_param[k] = [v.low, v.high]
-                self.eval_logbase[k] = 1
-            elif isinstance(v, LogSpace):
-                self.eval_param[k] = [v.low, v.high]
-                self.eval_logbase[k] = v.logbase
+                self.eval_func[k] = v.map_func
             elif isinstance(v, list):
                 assert len(v) == 1, "Attention, PSO search currently does not support discrete param list"
                 self.fixed_param[k] = v[0]
@@ -270,7 +267,7 @@ class PSOSearchCV(BaseSearchCV):
         results = {}
         for i in range(self.iterations):
             swarm_pos = optimizer.get_current_pos()
-            swarm_pos = self.get_log_position(swarm_pos)
+            swarm_pos = self.get_real_position(swarm_pos)
             pos_parameters = [{swarm_keys[idx]:params[idx] for idx in range(len(min_bound))} for params in swarm_pos]
             pos_parameters = [{**n, **self.fixed_param} for n in pos_parameters]
             candidate_params, out = self._evalFunction(X, y, groups, pos_parameters)
@@ -289,24 +286,22 @@ class PSOSearchCV(BaseSearchCV):
                 print("Accuracy Requirement reached, optimization stop.")
         final_best_cost, final_best_pos = optimizer.finalize()
         print('The best cost found by pso is: {:.4f}'.format(final_best_cost))
-        print('The best position found by pso is: {}'.format(self.get_log_position(final_best_pos)))
+        print('The best position found by pso is: {}'.format(self.get_real_position(final_best_pos)))
         
         results = self._format_results(
                     all_candidate_params, self.scorers, n_splits, all_out)
         return results
     
-    def get_log_position(self, pos):
+    def get_real_position(self, pos):
         
-        logbases = [self.eval_logbase[v]for v in self.eval_param.keys()]
+        funcs = [self.eval_func[v]for v in self.eval_param.keys()]
         new_pos = pos.copy()
         if len(pos.shape) == 2:
-            for i in range(len(logbases)):
-                if logbases[i] != 1:
-                    new_pos[:, i] =  logbases[i] ** pos[:, i]
+            for i in range(len(funcs)):
+                new_pos[:, i] =  funcs[i](pos[:, i])
         elif len(pos.shape) == 1:
-            for i in range(len(logbases)):
-                if logbases[i] != 1:
-                    new_pos[i] =  logbases[i] ** pos[i]
+            for i in range(len(funcs)):
+                new_pos[i] =  funcs[i](pos[i])
         return new_pos
         
         

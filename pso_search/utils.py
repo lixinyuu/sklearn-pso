@@ -5,7 +5,17 @@ import warnings
 
 import numpy as np
 
-class Bound:
+class BaseMapFunction:
+    """
+    The base class used to generate a map function from PSO searched 
+    values to real values.
+    """
+    def __init__(self, func, low, high):
+        self.map_func = func
+        self.low = low
+        self.high = high
+
+class Bound(BaseMapFunction):
     """
     The class used to generate the bound condition in 
     the PSO optimation
@@ -15,8 +25,9 @@ class Bound:
         self.logbase = 1
         self.low = np.min([a, b])
         self.high = np.max([a, b])
+        self.map_func = lambda x: x
 
-class LogSpace:
+class LogSpace(BaseMapFunction):
     """
     The class used to define a log space for PSO to search
     If we are going to find a paramers between 1e-9 to 1e9,
@@ -32,3 +43,4 @@ class LogSpace:
         self.logbase = logbase
         self.low = np.min([a, b])
         self.high = np.max([a, b])
+        self.map_func =  lambda x: self.logbase ** x
