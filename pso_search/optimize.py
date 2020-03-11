@@ -1,6 +1,6 @@
-import logging
+# -*- coding: utf-8 -*-
 
-# Import modules
+import logging
 import numpy as np
 import multiprocessing as mp
 
@@ -25,7 +25,9 @@ class PSOoptimizer(SwarmOptimizer):
         ftol=-np.inf,
         init_pos=None,
     ):
-        """Initialize the swarm
+        """
+        A custom optimizer modified from pyswarms.single.global_best
+        https://github.com/ljvmiranda921/pyswarms/blob/master/pyswarms/single/global_best.py
         Attributes
         ----------
         n_particles : int
@@ -95,24 +97,15 @@ class PSOoptimizer(SwarmOptimizer):
         return self.swarm.position        
 
     def update(self, iters, current_cost, **kwargs):
-        """Optimize the swarm for a number of iterations
-        Performs the optimization to evaluate the objective
-        function :code:`f` for a number of iterations :code:`iter.`
+        """
+        Optimize the swarm for one iteration by providing its cost
+        manually.
         Parameters
         ----------
-        objective_func : callable
-            objective function to be evaluated
         iters : int
-            number of iterations
-        n_processes : int
-            number of processes to use for parallel particle evaluation (default: None = no parallelization)
-        kwargs : dict
-            arguments for the objective function
-        Returns
-        -------
-        tuple
-            the global best cost and the global best position.
-        """
+            the current iterations
+        current_cost : ndarray
+            the current cost which should be provided
 
         self.rep.log("Obj. func. args: {}".format(kwargs), lvl=logging.DEBUG)
         self.rep.log(
@@ -136,13 +129,15 @@ class PSOoptimizer(SwarmOptimizer):
             velocity=self.swarm.velocity,
         )
         self._populate_history(hist)
+        
         # Verify stop criteria based on the relative acceptable cost ftol
         relative_measure = self.ftol * (1 + np.abs(best_cost_yet_found))
         if (
             np.abs(self.swarm.best_cost - best_cost_yet_found) < relative_measure
             ):
             self.reached_requirement = 1
-            # Perform velocity and position updates
+            
+        # Perform velocity and position updates
         self.swarm.velocity = self.top.compute_velocity(
                 self.swarm, self.velocity_clamp, self.vh, self.bounds
             )
@@ -151,7 +146,10 @@ class PSOoptimizer(SwarmOptimizer):
             )
  
     
-    def finalize(self):# Obtain the final best_cost and the final best_position
+    def finalize(self):
+        """
+        Obtain the final best_cost and the final best_position
+        """
         final_best_cost = self.swarm.best_cost.copy()
         final_best_pos = self.swarm.pbest_pos[self.swarm.pbest_cost.argmin()].copy()
         # Write report in log and return final cost and position

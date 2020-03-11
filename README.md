@@ -2,9 +2,9 @@
 Use partical swarm optimization instead of gridsearch in scikit-learn. There is a similar package sklearn-deap which use evolutionary algortihms to find the parameters. However, PSO should works better in continuous parameters search.
 
 It's implemented using pyswarms library: https://github.com/ljvmiranda921/pyswarms \
-Heavily inspired by:\
+Also heavily inspired by:\
 sklearn-deap: https://github.com/rsteca/sklearn-deap \
-scikit-learn https://github.com/scikit-learn/scikit-learn \
+scikit-learn https://github.com/scikit-learn/scikit-learn 
 
 Install
 -------
@@ -28,7 +28,9 @@ from sklearn.model_selection import StratifiedKFold
 from pso_search.utils import Bound, LogSpace
 
 paramgrid = {"kernel": ["rbf"],
-             "C"     : LogSpace(10., -9., 9.),
+             "C"     : LogSpace(10., -9., 9.), 
+                       # LogSpace means the value x is between [-9, 9] in 
+                       # PSO optimization, but the actual C = 10 ** x in SVC
              "gamma" : LogSpace(10., -9., 9.)}
 
 random.seed(1)
