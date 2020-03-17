@@ -25,7 +25,7 @@ y = data["target"]
 
 from sklearn.svm import SVC
 from sklearn.model_selection import StratifiedKFold
-from pso_search.utils import Bound, LogSpace
+from pso_search import Bound, LogSpace
 
 paramgrid = {"kernel": ["rbf"],
              "C"     : LogSpace(10., -9., 9.), 
