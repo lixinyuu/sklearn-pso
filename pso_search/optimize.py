@@ -10,7 +10,6 @@ from pyswarms.backend.handlers import BoundaryHandler, VelocityHandler
 from pyswarms.base import SwarmOptimizer
 from pyswarms.utils.reporter import Reporter
 
-
 class PSOoptimizer(SwarmOptimizer):
     def __init__(
         self,
@@ -162,5 +161,11 @@ class PSOoptimizer(SwarmOptimizer):
         )
         return (final_best_cost, final_best_pos)
     
-    def optimize(self):
-        pass
+    def optimize(self, objective_func, iters,  **kwargs):
+        # 
+        for _iter in range(iters):
+            swarm_pos = self.get_current_pos()
+            current_cost = objective_func(swarm_pos, **kwargs)
+            self.update(_iter, current_cost)
+        return self.finalize()
+        
