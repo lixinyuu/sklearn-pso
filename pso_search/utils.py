@@ -44,3 +44,15 @@ class LogSpace(BaseMapFunction):
         self.low = np.min([a, b])
         self.high = np.max([a, b])
         self.map_func =  lambda x: self.logbase ** x
+
+class IntBound(BaseMapFunction):
+    """
+    The class used to generate the bound condition in 
+    the PSO optimation
+    """
+    def __init__(self, a, b):
+        assert a != b
+        self.logbase = 1
+        self.low = np.min([a, b])
+        self.high = np.max([a, b])
+        self.map_func = lambda x: np.around(x).astype(int)

@@ -171,7 +171,9 @@ class PSOSearchCV(BaseSearchCV):
         self.best_mem_score_ = float("-inf")
         self.best_mem_params_ = None
         base_estimator = clone(self.estimator)
-        n_splits = self.cv.get_n_splits(X, y)
+        cv_orig = check_cv(self.cv, y, classifier=is_classifier(self.estimator))
+        n_splits = cv_orig.get_n_splits(X, y, groups)
+        self.cv = cv_orig
         self.scorers, self.multimetric_ = _check_multimetric_scoring(
                                         self.estimator, scoring=self.scoring)
         if self.multimetric_:
@@ -299,7 +301,7 @@ class PSOSearchCV(BaseSearchCV):
     def get_real_position(self, pos):
         
         funcs = [self.eval_func[v]for v in self.eval_param.keys()]
-        new_pos = pos.copy()
+        new_pos = pos.copy().astype(object) # astype object to preserve int
         if len(pos.shape) == 2:
             for i in range(len(funcs)):
                 new_pos[:, i] =  funcs[i](pos[:, i])
